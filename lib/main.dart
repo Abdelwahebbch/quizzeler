@@ -1,5 +1,4 @@
-import 'dart:math';
-import 'Questions.dart';
+import 'QuestionsBrain.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -33,20 +32,18 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   List<Widget> scoreKeeper = [];
 
-  List<Question> questions = [
-    Question(ques: "Esmek Abdelwaheb ?  ", respo: true),
-    Question(ques: "Israel it's a county ? ", respo: false),
-  ];
-
-  Icon checkQuestion(bool resp, Question q) {
-    if (q.respo == resp) {
+  Icon checkQuestion(bool resp, bool q) {
+    if (q == resp) {
+      score += 10;
       return Icon(Icons.check, color: Colors.green);
     } else {
+      score -= 10;
       return Icon(Icons.close, color: Colors.red);
     }
   }
 
-  int index = Random().nextInt(2);
+  int score = 0;
+  QuestionsBrain q = QuestionsBrain();
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +53,18 @@ class _QuizPageState extends State<QuizPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
+            child: Text(
+              "Score : $score",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          Expanded(
             flex: 5,
             child: Padding(
               padding: EdgeInsets.all(10.0),
               child: Center(
                 child: Text(
-                  questions[index].getQues(),
+                  q.getQuestion(),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 25.0, color: Colors.white),
                 ),
@@ -84,9 +87,11 @@ class _QuizPageState extends State<QuizPage> {
                 onPressed: () {
                   //The user picked true.
                   setState(() {
-                    scoreKeeper.add(checkQuestion(true, questions[index]));
+                    scoreKeeper.add(
+                      checkQuestion(true, q.getQuestionResponse()),
+                    );
+                    q.NextQuestion();
                   });
-                  index = Random().nextInt(2);
                 },
               ),
             ),
@@ -107,9 +112,11 @@ class _QuizPageState extends State<QuizPage> {
                 onPressed: () {
                   //The user picked false.
                   setState(() {
-                    scoreKeeper.add(checkQuestion(false, questions[index]));
+                    scoreKeeper.add(
+                      checkQuestion(false, q.getQuestionResponse()),
+                    );
+                    q.NextQuestion();
                   });
-                  index = Random().nextInt(2);
                 },
               ),
             ),
